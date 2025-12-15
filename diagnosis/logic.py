@@ -44,4 +44,31 @@ MESSAGES = {
             "その問いを考えられなかった自分に、理由があった可能性はないでしょうか。"
         ],
         "questions": [
-            "自分の気持ちを考えること自
+            "自分の気持ちを考えること自体を、避けてきたことはありませんか？",
+            "それは、いつ頃から始まったと思いますか？"
+        ],
+        "cta": "この問いを一人で抱え続けるのが少し重たいと感じたら、短い言葉でも受け取ることはできます。"
+    }
+}
+
+
+def get_level(score):
+    if score >= 22:
+        return "strong"
+    elif score >= 14:
+        return "middle"
+    else:
+        return "light"
+
+
+def build_message(score):
+    level = get_level(score)
+    data = MESSAGES[level]
+
+    return {
+        "level": level,
+        "observation": random.choice(data["observations"]),
+        "needle": random.choice(data["needles"]),
+        "question": random.choice(data["questions"]),
+        "cta": data["cta"]
+    }
