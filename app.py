@@ -32,8 +32,8 @@ def form():
 
         result = build_message(total_score)
 
-        # ★ スプシ保存（最終形・env方式）
-        save_result(result["level"], total_score)
+        # ★ スプシ保存（一旦off）
+        #save_result(result["level"], total_score)
 
         return render_template("result.html", result=result)
 
