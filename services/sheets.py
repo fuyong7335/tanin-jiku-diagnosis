@@ -22,5 +22,6 @@ def get_client():
 
 def save_result(level, score):
     client = get_client()
-    sheet = client.open("1f9nZ2SW43Q86UEH1hiAeAn10ZNf-jYWfiQbl65SB2C0").sheet1
+    sheet = client.open_by_key("1f9nZ2SW43Q86UEH1hiAeAn10ZNf-jYWfiQbl65SB2C0").sheet1
     sheet.append_row([level, score])
+
