@@ -1,0 +1,85 @@
+<!-- templates/result.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>診断結果</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body{
+      margin:0;
+      background:#fbf5f7;
+      font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+      color:#3a3a3a;
+      line-height:1.9;
+    }
+    .page{
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
+      box-sizing:border-box;
+    }
+    .card{
+      background:#fff;
+      width:100%;
+      max-width:640px;
+      padding:32px 28px;
+      border-radius:16px;
+      box-shadow:0 6px 20px rgba(0,0,0,.05);
+    }
+    h1{
+      font-size:20px;
+      margin-bottom:20px;
+    }
+    .block{
+      margin-bottom:20px;
+    }
+    .needle{
+      padding:16px;
+      background:#fdf0f3;
+      border-left:4px solid #f2c6d0;
+    }
+    .cta{
+      margin-top:32px;
+      font-size:14px;
+      color:#555;
+    }
+    a.back{
+      display:inline-block;
+      margin-top:24px;
+      color:#777;
+      text-decoration:none;
+      font-size:14px;
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="card">
+      <h1>診断結果</h1>
+
+      <div class="block">
+        {{ result.observation }}
+      </div>
+
+      <div class="block needle">
+        {{ result.needle }}
+      </div>
+
+      <div class="block">
+        {{ result.question }}
+      </div>
+
+      {% if result.level == "strong" %}
+        <div class="cta">
+          {{ result.cta }}
+        </div>
+      {% endif %}
+
+      <a class="back" href="/">トップへ戻る</a>
+    </div>
+  </div>
+</body>
+</html>
