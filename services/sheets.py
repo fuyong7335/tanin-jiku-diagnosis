@@ -22,5 +22,5 @@ def get_client():
 
 def save_result(level, score):
     client = get_client()
-    sheet = client.open("tanin_diagnosis_logs").sheet1
+    sheet = client.open("1f9nZ2SW43Q86UEH1hiAeAn10ZNf-jYWfiQbl65SB2C0").sheet1
     sheet.append_row([level, score])
