@@ -2,6 +2,8 @@
 # tanin-jiku-diabnosis の起点ファイル
 # 役割：アプリ起動・ルーティング・env読み込み
 
+import logging
+logging.basicConfig(level=logging.INFO)
 from dotenv import load_dotenv
 load_dotenv()  # ★ 必ず最初に読む（env方式の要）
 
@@ -18,26 +20,34 @@ app = Flask(__name__)
 def index():
     return render_template("index.html")
 
-
 @app.route("/form", methods=["GET", "POST"])
 def form():
     if request.method == "POST":
-        scores = []
+        try:
+            scores = []
+            for key in request.form:
+                if key.startswith("answer"):
+                    scores.append(int(request.form[key]))
 
-        for key in request.form:
-            if key.startswith("answer"):
-                scores.append(int(request.form[key]))
+            total_score = sum(scores)
+            result = build_message(total_score)
 
-        total_score = sum(scores)
+            # ログ出力（必ず Render Logs に出る）
+            print("POST received")
+            print("total_score:", total_score)
+            print("result level:", result["level"])
 
-        result = build_message(total_score)
+            save_result(result["level"], total_score)
 
-        # ★ スプシ保存
-        save_result(result["level"], total_score)
+            return render_template("result.html", result=result)
 
-        return render_template("result.html", result=result)
+        except Exception as e:
+            print("=== POST ERROR ===")
+            print(e)
+            raise
 
     return render_template("form.html", questions=QUESTIONS)
+
 
 
 if __name__ == "__main__":
