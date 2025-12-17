@@ -75,7 +75,43 @@
         直感でお答えください。
       </div>
 
-      <form method="post">
+      
+<form method="post">
+
+  <!-- ★ ここに入れる -->
+  <div class="question">
+    <div class="question-title">メールアドレス</div>
+    <input
+      type="email"
+      name="email"
+      required
+      placeholder="example@example.com"
+    >
+  </div>
+
+  {% for q in questions %}
+    <div class="question">
+      <div class="question-title">
+        Q{{ q.id }}. {{ q.text }}
+      </div>
+      {% for choice, value in q.choices %}
+        <label>
+          <input
+            type="radio"
+            name="answer{{ q.id }}"
+            value="{{ value }}"
+            required
+          >
+          {{ choice }}
+        </label>
+      {% endfor %}
+    </div>
+  {% endfor %}
+
+  <button type="submit">結果を見る</button>
+</form>
+
+                <input type="email" name="email" required>
         {% for q in questions %}
           <div class="question">
             <div class="question-title">
