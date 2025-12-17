@@ -33,9 +33,11 @@ def form():
             result = build_message(total_score)
 
             # ログ出力（必ず Render Logs に出る）
-            print("POST received")
-            print("total_score:", total_score)
-            print("result level:", result["level"])
+            logging.info("POST received")
+            logging.info(f"total_score: {total_score}")
+            logging.info(f"result level: {result['level']}")
+            logging.info(f"email: {email}")
+            email = request.form.get("email")
 
             save_result(result["level"], total_score)
 
