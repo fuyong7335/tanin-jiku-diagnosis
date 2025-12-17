@@ -24,6 +24,8 @@ def index():
 def form():
     if request.method == "POST":
         try:
+            email = request.form.get("email")
+            
             scores = []
             for key in request.form:
                 if key.startswith("answer"):
@@ -37,7 +39,7 @@ def form():
             logging.info(f"total_score: {total_score}")
             logging.info(f"result level: {result['level']}")
             logging.info(f"email: {email}")
-            email = request.form.get("email")
+            
 
             save_result(result["level"], total_score)
 
