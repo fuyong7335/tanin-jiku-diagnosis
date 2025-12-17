@@ -41,7 +41,7 @@ def form():
             logging.info(f"email: {email}")
             
 
-            save_result(result["level"], total_score)
+            save_result(email, result["level"], total_score)
 
             return render_template("result.html", result=result)
 
