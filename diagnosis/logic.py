@@ -1,79 +1,74 @@
-# diagnosis/logic.py
-# 役割：合計スコアからタイプ判定し、結果メッセージを組み立てる
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>診断結果</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
 
-import random
-
-MESSAGES = {
-    "light": {
-        "observations": [
-            "人の気持ちを大切にしながらも、自分の感覚を見失わずにいられる場面が増えてきています。",
-            "周囲への配慮と自分の意思のバランスを、少しずつ取れている状態です。"
-        ],
-        "needles": [
-            "ただ、そのバランスは無意識のうちに崩れやすいものでもあります。",
-            "気づかないうちに、自分より他人を優先していないでしょうか。"
-        ],
-        "questions": [
-            "最近、自分の気持ちをそのまま選択できた場面はありましたか？",
-            "その選択は、本当に自分が望んだものでしたか？"
-        ],
-        "cta": ""
-    },
-    "middle": {
-        "observations": [
-            "人の期待を感じ取る力が高く、その分、自分の本音を後回しにしてきたようです。",
-            "場の空気を読むことが当たり前になり、自分の感覚が後ろに下がっている状態です。"
-        ],
-        "needles": [
-            "それは優しさであると同時に、無理の積み重ねでもあります。",
-            "「気にしすぎ」と言われてきた経験が影響していないでしょうか。"
-        ],
-        "questions": [
-            "本当は断りたかったのに、引き受けたことはありませんか？",
-            "そのとき、自分の気持ちはどこに置いていましたか？"
-        ],
-        "cta": ""
-    },
-    "strong": {
-        "observations": [
-            "これまで自分を後回しにして生きてくる必要があった状況があったように感じます。",
-            "周囲を優先することで、自分を守ってきた時間が長かったのかもしれません。"
-        ],
-        "needles": [
-            "『もし誰にも迷惑をかけなくていいとしたら』という問いが、浮かばなかったとしたら。",
-            "その問いを考えられなかった自分に、理由があった可能性はないでしょうか。"
-        ],
-        "questions": [
-            "自分の気持ちを考えること自体を、避けてきたことはありませんか？",
-            "それは、いつ頃から始まったと思いますか？"
-        ],
-        "cta":"この問いを、今日はひとりで抱えなくてもいいと思えたら、一通だけ、言葉を置きに来てください。",
-
-               "このやり取りは、あなたからの一通に、私が一通お返しする形で終わります。",
-
-               "長い文章や、うまい言葉でなくて大丈夫です。",
-
-               "※このやり取りは有料です。"
-         },
-
-
-def get_level(score):
-    if score >= 22:
-        return "strong"
-    elif score >= 14:
-        return "middle"
-    else:
-        return "light"
-
-
-def build_message(score):
-    level = get_level(score)
-    data = MESSAGES[level]
-
-    return {
-        "level": level,
-        "observation": random.choice(data["observations"]),
-        "needle": random.choice(data["needles"]),
-        "question": random.choice(data["questions"]),
-        "cta": data["cta"]
+  <style>
+    body {
+      margin: 0;
+      background-color: #fbf5f7;
+      font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+      color: #3a3a3a;
+      line-height: 1.9;
     }
+
+    .page {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+
+    .card {
+      background: #ffffff;
+      max-width: 680px;
+      width: 100%;
+      padding: 28px;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+    }
+
+    .block {
+      margin-bottom: 20px;
+    }
+
+    .cta {
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid #f0d7df;
+      font-size: 14px;
+      color: #555;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="page">
+    <div class="card">
+
+      <div class="block">
+        {{ result.observation | replace('\n', '<br>') | safe }}
+      </div>
+
+      <div class="block">
+        {{ result.needle | replace('\n', '<br>') | safe }}
+      </div>
+
+      <div class="block">
+        {{ result.question | replace('\n', '<br>') | safe }}
+      </div>
+
+      {% if result.cta %}
+        <div class="cta">
+          {{ result.cta | replace('\n', '<br>') | safe }}
+        </div>
+      {% endif %}
+
+    </div>
+  </div>
+</body>
+</html>
