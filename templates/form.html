@@ -1,126 +1,30 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <title>診断フォーム</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <style>
-    body{
-      margin:0;
-      background:#fbf5f7;
-      font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
-      color:#3a3a3a;
-      line-height:1.9;
-    }
-    .page{
-      min-height:100vh;
-      display:flex;
-      justify-content:center;
-      padding:24px;
-      box-sizing:border-box;
-    }
-    .card{
-      background:#fff;
-      width:100%;
-      max-width:720px;
-      padding:28px;
-      border-radius:16px;
-      box-shadow:0 4px 14px rgba(0,0,0,.03);
-    }
-    h1{
-      font-size:20px;
-      margin-bottom:8px;
-    }
-    .desc{
-      font-size:14px;
-      color:#666;
-      margin-bottom:24px;
-    }
-    .question{
-      margin-bottom:24px;
-    }
-    .question-title{
-      margin-bottom:8px;
-      font-weight:600;
-    }
-    label{
-      display:block;
-      margin:6px 0;
-      cursor:pointer;
-    }
-    .email-input{
-      width:100%;
-      padding:12px 14px;
-      font-size:16px;
-      border-radius:8px;
-      border:1px solid #e5cfd6;
-      box-sizing:border-box;
-    }
-    button{
-      display:block;
-      width:100%;
-      margin-top:24px;
-      padding:14px;
-      border:none;
-      border-radius:999px;
-      background:#f2c6d0;
-      font-size:16px;
-      font-weight:600;
-      cursor:pointer;
-    }
-    button:hover{
-      opacity:.9;
-    }
-  </style>
-</head>
+<form method="post">
 
-<body>
-  <div class="page">
-    <div class="card">
-      <h1>他人軸タイプ診断</h1>
-      <div class="desc">
-        モヤモヤや違和感の奥にある「あなたの本音のクセ」を知るための10問です。<br>
-        直感でお答えください。
-      </div>
-
-      <form method="post">
-
-        <!-- メールアドレス -->
-        <div class="question">
-          <div class="question-title">メールアドレス</div>
-          <input
-            type="email"
-            name="email"
-            required
-            placeholder="example@example.com"
-            class="email-input"
-          >
-        </div>
-
-        <!-- 質問 -->
-        {% for q in questions %}
-          <div class="question">
-            <div class="question-title">
-              Q{{ q.id }}. {{ q.text }}
-            </div>
-            {% for choice, value in q.choices %}
-              <label>
-                <input
-                  type="radio"
-                  name="answer{{ q.id }}"
-                  value="{{ value }}"
-                  required
-                >
-                {{ choice }}
-              </label>
-            {% endfor %}
-          </div>
-        {% endfor %}
-
-        <button type="submit">結果を見る</button>
-      </form>
-
-    </div>
+  <!-- メール入力欄（1回） -->
+  <div class="question">
+    <div class="question-title">メールアドレス</div>
+    <input type="email" name="email" required>
   </div>
-</body>
-</html>
+
+  <!-- 質問ループ（1回） -->
+  {% for q in questions %}
+    <div class="question">
+      <div class="question-title">
+        Q{{ q.id }}. {{ q.text }}
+      </div>
+      {% for choice, value in q.choices %}
+        <label>
+          <input
+            type="radio"
+            name="answer{{ q.id }}"
+            value="{{ value }}"
+            required
+          >
+          {{ choice }}
+        </label>
+      {% endfor %}
+    </div>
+  {% endfor %}
+
+  <button type="submit">結果を見る</button>
+</form>
