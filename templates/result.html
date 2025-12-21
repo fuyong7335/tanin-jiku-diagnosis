@@ -1,85 +1,73 @@
-<!-- templates/result.html -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
   <title>診断結果</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <style>
-    body{
-      margin:0;
-      background:#fbf5f7;
-      font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
-      color:#3a3a3a;
-      line-height:1.9;
-    }
-    .page{
-      min-height:100vh;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      padding:24px;
-      box-sizing:border-box;
-    }
-    .card{
-      background:#fff;
-      max-width:680px;
-      width:100%;
-      padding:28px;
-      border-radius:16px;
-      box-shadow:0 4px 14px rgba(0,0,0,0.03);
+    body {
+      margin: 0;
+      background-color: #fbf5f7;
+      font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+      color: #3a3a3a;
+      line-height: 1.9;
     }
 
-    h1{
-      font-size:20px;
-      margin-bottom:20px;
+    .page {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      box-sizing: border-box;
     }
-    .block{
-      margin-bottom:20px;
+
+    .card {
+      background: #ffffff;
+      max-width: 680px;
+      width: 100%;
+      padding: 28px;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.05);
     }
-    .needle{
-      padding:16px;
-      background:#fdf0f3;
-      border-left:4px solid #f2c6d0;
+
+    .block {
+      margin-bottom: 20px;
     }
-    .cta{
-      margin-top:32px;
-      font-size:14px;
-      color:#555;
-    }
-    a.back{
-      display:inline-block;
-      margin-top:24px;
-      color:#777;
-      text-decoration:none;
-      font-size:14px;
+
+    .cta {
+      margin-top: 28px;
+      padding-top: 20px;
+      border-top: 1px solid #f0d7df;
+      font-size: 14px;
+      color: #555;
     }
   </style>
 </head>
+
 <body>
   <div class="page">
     <div class="card">
-      <h1>診断結果</h1>
 
       <div class="block">
-        {{ result.observation }}
-      </div>
-
-      <div class="block needle">
-        {{ result.needle }}
+        {{ result.observation | replace('\n', '<br>') | safe }}
       </div>
 
       <div class="block">
-        {{ result.question }}
+        {{ result.needle | replace('\n', '<br>') | safe }}
       </div>
 
-      {% if result.level == "strong" %}
+      <div class="block">
+        {{ result.question | replace('\n', '<br>') | safe }}
+      </div>
+
+      {% if result.cta %}
         <div class="cta">
-          {{ result.cta }}
+          {{ result.cta | replace('\n', '<br>') | safe }}
         </div>
       {% endif %}
 
-      <a class="back" href="/">トップへ戻る</a>
     </div>
   </div>
 </body>
