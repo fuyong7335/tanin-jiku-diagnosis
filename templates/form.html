@@ -53,13 +53,14 @@
 
     /* メール入力欄 */
     .email-input {
-      width: 100%;
-      padding: 10px 12px;
-      font-size: 15px;
-      border-radius: 8px;
-      border: 1px solid #ddd;
-      box-sizing: border-box;
-    }
+     width: 50%;
+     max-width: 320px;   /* PCでも広がりすぎない */
+     padding: 10px 12px;
+     font-size: 15px;
+     border-radius: 8px;
+     border: 1px solid #ddd;
+     box-sizing: border-box;
+   }
 
     label {
       display: block;
@@ -70,9 +71,10 @@
 
     button {
       display: block;
-      width: 100%;
-      margin-top: 32px;
-      padding: 12px;
+      width: 50%;
+      max-width: 240px;
+      margin: 32px auto 0;  /* ← 中央寄せ */
+      padding: 10px;
       border: none;
       border-radius: 24px;
       background: #f2c6d0;
