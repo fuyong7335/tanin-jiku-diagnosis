@@ -34,14 +34,16 @@
 
     .block {
       margin-bottom: 20px;
+      font-size: 15px;
     }
 
-    .cta {
+    .stop {
       margin-top: 28px;
       padding-top: 20px;
       border-top: 1px solid #f0d7df;
       font-size: 14px;
       color: #555;
+      white-space: pre-line;
     }
   </style>
 </head>
@@ -50,23 +52,25 @@
   <div class="page">
     <div class="card">
 
+      <!-- 観察 -->
       <div class="block">
-        {{ result.observation | replace('\n', '<br>') | safe }}
+        {{ result.observation }}
       </div>
 
+      <!-- 鏡 -->
       <div class="block">
-        {{ result.needle | replace('\n', '<br>') | safe }}
+        {{ result.mirror }}
       </div>
 
+      <!-- 問い -->
       <div class="block">
-        {{ result.question | replace('\n', '<br>') | safe }}
+        {{ result.question }}
       </div>
 
-      {% if result.cta %}
-        <div class="cta">
-          {{ result.cta | replace('\n', '<br>') | safe }}
-        </div>
-      {% endif %}
+      <!-- ここで止める -->
+      <div class="stop">
+        {{ result.stop }}
+      </div>
 
     </div>
   </div>
