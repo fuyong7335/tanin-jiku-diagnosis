@@ -1,39 +1,124 @@
+# diagnosis/logic.py
+import random
+
+STOP_MESSAGE = (
+    "ここから先は、\n"
+    "決まった文章ではうまくお返しできません。\n\n"
+    "感じている思いは同じかもしれませんが、\n"
+    "それをどう言葉にするかは人それぞれだからです。\n\n"
+    "もし今、あなたの言葉で少しだけ書けることがあるなら、\n"
+    "必要な方にだけ、1通のみメールで言葉を送ることができます。\n"
+    "（送らなくても、診断はここで完了です）"
+)
+
 MESSAGES = {
+    "light": {
+        "observation": [
+            "今回の回答からは、判断の舵を内側に戻す力がすでにある様子が見えます。",
+            "他人の影響を受けつつも、自分の感覚を完全には失っていない状態です。"
+        ],
+        "mirror": [
+            "ただ、忙しさや緊張が続くと、外側に引っ張られやすい場面もありそうです。",
+            "無意識のうちに「合わせる選択」が増えていないでしょうか。"
+        ],
+        "question": [
+            "最近、自分の感覚を優先できた場面はありましたか？",
+            "そのとき、何が支えになっていましたか？"
+        ]
+    },
+
     "middle": {
-        "observations": [
-            "人の期待を感じ取る力が高く、その分、自分の本音を後回しにしてきたようです。",
-            "場の空気を読むことが当たり前になり、自分の感覚が後ろに下がっている状態です。"
+        "observation": [
+            "今回の回答は、自分軸と他人軸が場面によって入れ替わる傾向を示しています。",
+            "普段は保てていても、負荷がかかると外側に寄りやすい状態です。"
         ],
-        "needles": [
-            "それは優しさでもあり、同時に無理が続いてきた証でもあります。",
-            "ここまで自然にやってきたことほど、自分では気づきにくいものです。"
+        "mirror": [
+            "期待に応えようとする気持ちが、判断の前に立つことがありそうです。",
+            "「正解探し」が増えるほど、決断が重くなっていないでしょうか。"
         ],
-        "questions": [
-            "最近、自分の気持ちを後回しにした場面はありましたか？",
-            "もし少し立ち止まるとしたら、どんな違和感が残っていますか？"
+        "question": [
+            "外側に寄り始める合図は、あなたの場合どれでしょうか？",
+            "最近、自分の感覚を後回しにした回数は増えていますか？"
+        ]
+    },
+
+    "strong": {
+        "observation": [
+            "今回の回答からは、判断の舵が外側に置かれている時間が長い傾向が見えます。",
+            "自分で選んでいるつもりでも、反応に引っ張られやすい状態かもしれません。"
         ],
-        "cta": FIXED_CTA
+        "mirror": [
+            "周囲を優先することで、自分を守ってきた時間が長かった可能性があります。",
+            "「もし誰にも迷惑をかけなくていいとしたら」という問いが浮かびにくい状態です。"
+        ],
+        "question": [
+            "あなたの判断は、普段どこから許可を得ていますか？",
+            "反応が消えたら、選択はどこが変わりそうでしょうか？"
+        ]
     }
 }
+def get_level(score):
+    if score >= 22:
+        return "strong"
+    elif score >= 14:
+        return "middle"
+    else:
+        return "light"
 
-FIXED_CTA = """
-ここから先は、 
-決まった文章では
-うまくお返しできません。
 
-感じている思いは
-同じかもしれない
-ただ
-それをどう言葉にするかは
-人それぞれだからです。
+def build_message(score):
+    level = get_level(score)
+    data = MESSAGES[level]
 
-だから、
-あなたが今、
-自分の思いをどう感じているのかを
-あなた自身の言葉で聞かせてもらってから、
-言葉をお返ししたいと思っています。
+    return {
+        "level": level,
+        "observation": random.choice(data["observation"]),
+        "mirror": random.choice(data["mirror"]),
+        "question": random.choice(data["question"]),
+        "stop": STOP_MESSAGE
+    }
+# diagnosis/logic.py
 
-必要な方にだけ、
-1通ずつ
-お返ししています。
-"""
+import random
+
+# ① 固定の止め文
+STOP_MESSAGE = (
+    "ここから先は、\n"
+    "決まった文章ではうまくお返しできません。\n\n"
+    "感じている思いは同じかもしれませんが、\n"
+    "それをどう言葉にするかは人それぞれだからです。\n\n"
+    "もし今、あなたの言葉で少しだけ書けることがあるなら、\n"
+    "必要な方にだけ、1通のみメールで言葉を送ることができます。\n"
+    "（送らなくても、診断はここで完了です）"
+)
+
+# ② メッセージ素材
+MESSAGES = {
+    "light": { ... },
+    "middle": { ... },
+    "strong": { ... }
+}
+
+# ③ レベル判定
+def get_level(score):
+    if score >= 22:
+        return "strong"
+    elif score >= 14:
+        return "middle"
+    else:
+        return "light"
+
+# ④ ★これが build_message（固定）
+def build_message(score):
+    level = get_level(score)
+    data = MESSAGES[level]
+
+    return {
+        "level": level,
+        "observation": random.choice(data["observation"]),
+        "mirror": random.choice(data["mirror"]),
+        "question": random.choice(data["question"]),
+        "stop": STOP_MESSAGE
+    }
+
+
