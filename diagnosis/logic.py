@@ -1,6 +1,11 @@
 # diagnosis/logic.py
+# 役割：スコアからレベル判定し、診断メッセージを組み立てる
+
 import random
 
+# =========================
+# 固定の「止め文」
+# =========================
 STOP_MESSAGE = (
     "ここから先は、\n"
     "決まった文章ではうまくお返しできません。\n\n"
@@ -11,6 +16,9 @@ STOP_MESSAGE = (
     "（送らなくても、診断はここで完了です）"
 )
 
+# =========================
+# メッセージ素材
+# =========================
 MESSAGES = {
     "light": {
         "observation": [
@@ -57,6 +65,10 @@ MESSAGES = {
         ]
     }
 }
+
+# =========================
+# レベル判定
+# =========================
 def get_level(score):
     if score >= 22:
         return "strong"
@@ -65,7 +77,9 @@ def get_level(score):
     else:
         return "light"
 
-
+# =========================
+# 診断メッセージ生成
+# =========================
 def build_message(score):
     level = get_level(score)
     data = MESSAGES[level]
@@ -77,48 +91,3 @@ def build_message(score):
         "question": random.choice(data["question"]),
         "stop": STOP_MESSAGE
     }
-# diagnosis/logic.py
-
-import random
-
-# ① 固定の止め文
-STOP_MESSAGE = (
-    "ここから先は、\n"
-    "決まった文章ではうまくお返しできません。\n\n"
-    "感じている思いは同じかもしれませんが、\n"
-    "それをどう言葉にするかは人それぞれだからです。\n\n"
-    "もし今、あなたの言葉で少しだけ書けることがあるなら、\n"
-    "必要な方にだけ、1通のみメールで言葉を送ることができます。\n"
-    "（送らなくても、診断はここで完了です）"
-)
-
-# ② メッセージ素材
-MESSAGES = {
-    "light": { ... },
-    "middle": { ... },
-    "strong": { ... }
-}
-
-# ③ レベル判定
-def get_level(score):
-    if score >= 22:
-        return "strong"
-    elif score >= 14:
-        return "middle"
-    else:
-        return "light"
-
-# ④ ★これが build_message（固定）
-def build_message(score):
-    level = get_level(score)
-    data = MESSAGES[level]
-
-    return {
-        "level": level,
-        "observation": random.choice(data["observation"]),
-        "mirror": random.choice(data["mirror"]),
-        "question": random.choice(data["question"]),
-        "stop": STOP_MESSAGE
-    }
-
-
