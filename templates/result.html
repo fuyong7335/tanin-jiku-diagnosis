@@ -18,7 +18,6 @@
       min-height: 100vh;
       display: flex;
       justify-content: center;
-      align-items: center;
       padding: 24px;
       box-sizing: border-box;
     }
@@ -33,17 +32,26 @@
     }
 
     .block {
-      margin-bottom: 20px;
-      font-size: 15px;
+      margin-bottom: 22px;
+    }
+
+    .divider {
+      margin: 32px 0 20px;
+      border-top: 1px solid #f0d7df;
     }
 
     .stop {
-      margin-top: 28px;
-      padding-top: 20px;
-      border-top: 1px solid #f0d7df;
       font-size: 14px;
       color: #555;
-      white-space: pre-line;
+      margin-bottom: 16px;
+    }
+
+    .contact a {
+      display: inline-block;
+      margin-top: 8px;
+      text-decoration: none;
+      color: #b45a7c;
+      font-weight: 600;
     }
   </style>
 </head>
@@ -52,24 +60,28 @@
   <div class="page">
     <div class="card">
 
-      <!-- 観察 -->
       <div class="block">
         {{ result.observation }}
       </div>
 
-      <!-- 鏡 -->
       <div class="block">
         {{ result.mirror }}
       </div>
 
-      <!-- 問い -->
       <div class="block">
         {{ result.question }}
       </div>
 
-      <!-- ここで止める -->
+      <div class="divider"></div>
+
       <div class="stop">
-        {{ result.stop }}
+        {{ result.stop | replace('\n', '<br>') | safe }}
+      </div>
+
+      <div class="contact">
+        <a href="https://forms.gle/CE9BwQy6SnabUst59" target="_blank">
+          フォームはこちら
+        </a>
       </div>
 
     </div>
