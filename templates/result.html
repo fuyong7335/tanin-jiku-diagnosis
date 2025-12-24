@@ -9,11 +9,10 @@
     body {
       margin: 0;
       background-color: #fbf5f7;
-      font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+      font-family: "Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
       color: #3a3a3a;
       line-height: 1.9;
     }
-
     .page {
       min-height: 100vh;
       display: flex;
@@ -21,37 +20,23 @@
       padding: 24px;
       box-sizing: border-box;
     }
-
     .card {
-      background: #ffffff;
+      background: #fff;
       max-width: 680px;
       width: 100%;
       padding: 28px;
       border-radius: 16px;
       box-shadow: 0 6px 20px rgba(0,0,0,0.05);
     }
-
     .block {
-      margin-bottom: 22px;
+      margin-bottom: 18px;
     }
-
-    .divider {
-      margin: 32px 0 20px;
-      border-top: 1px solid #f0d7df;
-    }
-
     .stop {
+      margin-top: 28px;
+      padding-top: 18px;
+      border-top: 1px solid #e6cfd7;
       font-size: 14px;
       color: #555;
-      margin-bottom: 16px;
-    }
-
-    .contact a {
-      display: inline-block;
-      margin-top: 8px;
-      text-decoration: none;
-      color: #b45a7c;
-      font-weight: 600;
     }
   </style>
 </head>
@@ -72,16 +57,10 @@
         {{ result.question }}
       </div>
 
-      <div class="divider"></div>
-
       <div class="stop">
-        {{ result.stop | replace('\n', '<br>') | safe }}
-      </div>
-
-      <div class="contact">
-        <a href="https://forms.gle/CE9BwQy6SnabUst59" target="_blank">
-          フォームはこちら
-        </a>
+        {{ result.stop | replace('\n','<br>') | safe }}
+        <br><br>
+        <a href="https://forms.gle/CE9BwQy6SnabUst59">▶ フォームはこちら</a>
       </div>
 
     </div>
