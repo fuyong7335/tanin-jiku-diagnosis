@@ -4,14 +4,16 @@
   <meta charset="UTF-8">
   <title>診断結果</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+
   <style>
     body {
       margin: 0;
-      background-color: #fbf5f7; /* 淡いピンク */
+      background-color: #fbf5f7;
       font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
-      color: #333;
-      line-height: 1.8;
+      color: #3a3a3a;
+      line-height: 1.9;
     }
+
     .page {
       min-height: 100vh;
       display: flex;
@@ -20,61 +22,95 @@
       padding: 24px;
       box-sizing: border-box;
     }
+
     .card {
-      background: #fff;
-      max-width: 720px;
+      background: #ffffff;
+      max-width: 680px;
       width: 100%;
       padding: 28px;
-      border-radius: 12px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.04);
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,0.05);
     }
-    .section { margin-bottom: 18px; }
-    .muted { color:#666; font-size:14px; }
-    hr { border: none; border-top: 1px solid #f0d7df; margin: 20px 0; }
-    .lead { font-weight:600; margin-top:8px; }
-    .cta-link { display:inline-block; margin-top:12px; padding:10px 16px; border-radius:8px; background:#f2c6d0; color:#222; text-decoration:none; }
+
+    .level {
+      font-weight: 700;
+      margin-bottom: 12px;
+      font-size: 18px;
+    }
+
+    .para {
+      margin-bottom: 18px;
+      white-space: pre-wrap; /* 改行をそのまま表示 */
+      font-size: 15px;
+    }
+
+    .question {
+      font-style: italic;
+      color: #666;
+      margin-bottom: 18px;
+    }
+
+    .cta {
+      margin-top: 22px;
+      padding-top: 18px;
+      border-top: 1px solid #f0d7df;
+      font-size: 15px;
+      color: #333;
+    }
+
+    .cta-button {
+      display: inline-block;
+      margin-top: 12px;
+      padding: 10px 18px;
+      border-radius: 999px;
+      background: transparent;
+      border: 1px solid #eaaaaf;
+      text-decoration: none;
+      color: #7a2a3a;
+      font-weight: 700;
+    }
+
+    @media (max-width: 480px){
+      .card { padding: 20px; }
+      .level { font-size: 16px; }
+    }
   </style>
 </head>
+
 <body>
   <div class="page">
     <div class="card">
 
-      <div class="section">
-        <div class="muted">判定</div>
-        <div><strong>{{ result.level | capitalize }}</strong></div>
-      </div>
+      {% if result.level %}
+        <div class="level">判定 — {{ result.level|capitalize }}</div>
+      {% endif %}
 
-      <div class="section">
-        <div class="muted">観察</div>
-        <div>{{ result.observation | replace('\n','<br>') | safe }}</div>
-      </div>
+      {% if result.observation %}
+        <div class="para">{{ result.observation | replace('\n', '<br>') | safe }}</div>
+      {% endif %}
 
-      <div class="section">
-        <div class="muted">鏡（少し厳しめのフィードバック）</div>
-        <div>{{ result.mirror | replace('\n','<br>') | safe }}</div>
-      </div>
+      {% if result.mirror %}
+        <div class="para">{{ result.mirror | replace('\n', '<br>') | safe }}</div>
+      {% endif %}
 
-      <div class="section">
-        <div class="muted">一歩のリード</div>
-        <div class="lead">{{ result.lead | replace('\n','<br>') | safe }}</div>
-      </div>
+      {% if result.lead %}
+        <div class="para">{{ result.lead | replace('\n', '<br>') | safe }}</div>
+      {% endif %}
 
-      <div class="section">
-        <div class="muted">問い（短く）</div>
-        <div>{{ result.question | replace('\n','<br>') | safe }}</div>
-      </div>
+      {% if result.question %}
+        <div class="question">{{ result.question | replace('\n', '<br>') | safe }}</div>
+      {% endif %}
 
-      <hr>
-
-      <div class="section">
-        <div class="muted">さらに言葉を受け取りたい方へ</div>
-        <div>
-          <p style="margin:8px 0 0;">
-            もう少し言葉が欲しいと感じたら、こちらから短い返信をお送りします。下のフォームから送ってください（任意です）。
-          </p>
-          <a class="cta-link" href="https://forms.gle/CE9BwQy6SnabUst59" target="_blank">返信をお願いする（フォームへ）</a>
+      {% if result.cta %}
+        <div class="cta">
+          {{ result.cta | replace('\n', '<br>') | safe }}
+          {% if form_link %}
+            <div>
+              <a class="cta-button" href="{{ form_link }}" target="_blank" rel="noopener">返信フォームへ</a>
+            </div>
+          {% endif %}
         </div>
-      </div>
+      {% endif %}
 
     </div>
   </div>
