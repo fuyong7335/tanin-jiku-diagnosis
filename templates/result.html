@@ -1,68 +1,74 @@
+<!-- templates/result.html -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
   <title>診断結果</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-
   <style>
     body {
       margin: 0;
       background-color: #fbf5f7;
       font-family: "Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
-      color: #3a3a3a;
-      line-height: 1.9;
+      color: #333;
+      line-height: 1.8;
     }
     .page {
       min-height: 100vh;
-      display: flex;
-      justify-content: center;
-      padding: 24px;
-      box-sizing: border-box;
+      display:flex;
+      justify-content:center;
+      align-items:center;
+      padding:20px;
+      box-sizing:border-box;
     }
     .card {
-      background: #fff;
-      max-width: 680px;
-      width: 100%;
-      padding: 28px;
-      border-radius: 16px;
-      box-shadow: 0 6px 20px rgba(0,0,0,0.05);
+      background:#fff;
+      width:100%;
+      max-width:720px;
+      padding:28px;
+      border-radius:12px;
+      box-shadow:0 8px 30px rgba(0,0,0,0.06);
     }
-    .block {
-      margin-bottom: 18px;
-    }
-    .stop {
-      margin-top: 28px;
-      padding-top: 18px;
-      border-top: 1px solid #e6cfd7;
-      font-size: 14px;
-      color: #555;
+    .block { margin-bottom:18px; }
+    .observation { font-weight:600; font-size:18px; color:#222; }
+    .mirror { color:#444; }
+    .question { color:#555; font-style:italic; }
+    .stop { margin-top:22px; padding-top:18px; border-top:1px solid #f0d7df; color:#444; }
+    .cta-button {
+      display:inline-block;
+      margin-top:12px;
+      padding:10px 18px;
+      border-radius:999px;
+      background:#f2c6d0;
+      color:#222;
+      text-decoration:none;
+      font-weight:600;
     }
   </style>
 </head>
-
 <body>
   <div class="page">
     <div class="card">
-
-      <div class="block">
-        {{ result.observation }}
+      <div class="block observation">
+        {{ result.observation | replace('\n','<br>') | safe }}
       </div>
 
-      <div class="block">
-        {{ result.mirror }}
+      <div class="block mirror">
+        {{ result.mirror | replace('\n','<br>') | safe }}
       </div>
 
-      <div class="block">
-        {{ result.question }}
+      <div class="block question">
+        ○ 問い：{{ result.question | replace('\n','<br>') | safe }}
       </div>
 
       <div class="stop">
         {{ result.stop | replace('\n','<br>') | safe }}
-        <br><br>
-        <a href="https://forms.gle/CE9BwQy6SnabUst59">▶ フォームはこちら</a>
+        {% if form_url %}
+          <div>
+            <a class="cta-button" href="{{ form_url }}" target="_blank" rel="noopener noreferrer">こちらから連絡する</a>
+          </div>
+        {% endif %}
       </div>
-
     </div>
   </div>
 </body>
