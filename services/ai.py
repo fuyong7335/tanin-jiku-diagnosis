@@ -4,48 +4,39 @@ from openai import OpenAI
 
 client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-# 必要なら Render の環境変数で OPENAI_MODEL を変えられるようにしておく
-MODEL = os.getenv("OPENAI_MODEL", "gpt-5.2")
+SYSTEM_PROMPT = """
+あなたは日本語の文章作成者です。
+ユーザーの診断回答（文章の断片）を材料に、短く自然な日本語で結果メッセージを書きます。
 
-def generate_result_text(score: int, answers: list[int]) -> str:
-    """
-    10問の回答（0-4 or 1-5など）と合計スコアから、結果メッセージ本文だけ返す
-    ※ラベル（観察/鏡など）絶対出さない
-    """
-    # ここはあなたの採点に合わせて調整（例）
-    if score >= 22:
-        level = "strong"
-    elif score >= 14:
-        level = "middle"
-    else:
-        level = "light"
+制約:
+- 見出し（観察/鏡/問い/判定など）を出さない
+- 「今回の回答は」「傾向を示しています」など説明っぽい言い回しは避ける
+- 「舵」「外側/内側」など抽象メタファーは使わない
+- 4〜6行の短文（スマホで読みやすく）
+- 1行だけ、芯のある言葉を入れる（例: 選ぶのはあなた。答えはあなたの中にある。）
+- 断定しすぎない（〜かもしれません／〜になりやすい）
+"""
 
-    prompt = f"""
-あなたは「他人軸チェック」の結果文を作る編集者です。
-以下の条件を厳守して、日本語で短く書いてください。
+def generate_result_text(score: int, highlights_text: str) -> str:
+    # highlights_text は「強く出た回答（質問文）」の短い抜粋が入る想定
+    user_prompt = f"""
+スコア: {score}
 
-【絶対ルール】
-- 断定しない（〜の傾向/〜しやすい/〜かもしれません）
-- 心理診断・医療っぽい表現は禁止
-- 「観察」「鏡」「問い」などの見出し語は一切出さない
-- 一般論・自己啓発っぽいテンプレは禁止（ふわっと褒めない）
-- 回答にない事実を作らない（ハルシネーション禁止）
-- 全体は4〜6行。1行は短め。読み疲れさせない
+強く出た要素（抜粋）:
+{highlights_text}
 
-【入れてほしい“ビシッと1行”】【必須】
-- 「選ぶのも、決めるのも、あなたです。」（この文はそのまま入れる）
+この材料を使って、結果メッセージを4〜6行で作ってください。
+"""
 
-【入力】
-- 判定レベル（内部用）: {level}
-- 合計スコア: {score}
-- 回答の点数配列: {answers}
-
-では、結果メッセージ本文だけを書いてください。
-""".strip()
-
-    res = client.responses.create(
-        model=MODEL,
-        input=prompt,
+    # OpenAI公式の Python SDK は responses.create / output_text が使えます
+    # （platform.openai.com のドキュメント例と同じ形）
+    resp = client.responses.create(
+        model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
+        input=[
+            {"role": "system", "content": SYSTEM_PROMPT},
+            {"role": "user", "content": user_prompt},
+        ],
+        temperature=0.7,
+        max_output_tokens=220,
     )
-
-    return (res.output_text or "").strip()
+    return (resp.output_text or "").strip()
