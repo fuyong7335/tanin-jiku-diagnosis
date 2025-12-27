@@ -1,16 +1,15 @@
 # app.py
-import os
-import uuid
 import logging
-from dotenv import load_dotenv
-from flask import Flask, render_template, request
-
-load_dotenv()
 logging.basicConfig(level=logging.INFO)
 
+from dotenv import load_dotenv
+load_dotenv()
+
+from flask import Flask, render_template, request, redirect, url_for
+
 from diagnosis.questions import QUESTIONS
-from diagnosis.logic import build_message, get_level  # get_levelは内部用
-from services.sheets import append_log_row
+from diagnosis.logic import build_message, get_level
+from services.sheets import append_log_row, append_memo_row
 
 app = Flask(__name__)
 
@@ -21,76 +20,33 @@ def index():
 @app.route("/form", methods=["GET", "POST"])
 def form():
     if request.method == "POST":
-        try:
-            # 回答スコア収集
-            scores = []
-            for q in QUESTIONS:
-                v = request.form.get(f"answer{q['id']}")
-                scores.append(int(v))
+        scores = []
+        for key in request.form:
+            if key.startswith("answer"):
+                scores.append(int(request.form[key]))
 
-            total_score = sum(scores)
-            level = get_level(total_score)  # 画面には出さない（内部用）
-            session_id = str(uuid.uuid4())
+        total_score = sum(scores)
+        level = get_level(total_score)
 
-            # AIで結果文章生成（失敗時はフォールバック）
-            result_text = build_message(
-                score=total_score,
-                level=level,
-                questions=QUESTIONS,
-                scores=scores,
-            )
+        # AI診断文
+        result = build_message(total_score, scores)
 
-            # まず診断ログ（memo空）を保存
-            append_log_row(
-                session_id=session_id,
-                score=total_score,
-                level=level,
-                memo=""
-            )
+        # 個人情報なしログ保存
+        append_log_row(level, total_score)
 
-            logging.info("POST received")
-            logging.info(f"session_id: {session_id}")
-            logging.info(f"total_score: {total_score}")
-            logging.info(f"level(internal): {level}")
-
-            return render_template(
-                "result.html",
-                result={
-                    "text": result_text,
-                    "session_id": session_id,
-                    "score": total_score,
-                }
-            )
-
-        except Exception as e:
-            logging.exception("POST /form failed")
-            raise
+        logging.info(f"POST received score={total_score} level={level}")
+        return render_template("result.html", result=result, score=total_score, level=level)
 
     return render_template("form.html", questions=QUESTIONS)
 
 @app.route("/memo", methods=["POST"])
 def memo():
-    try:
-        session_id = request.form.get("session_id", "")
-        score = int(request.form.get("score", "0"))
-        memo_text = (request.form.get("memo") or "").strip()
+    memo_text = (request.form.get("memo") or "").strip()
+    level = request.form.get("level") or "unknown"
+    score = int(request.form.get("score") or 0)
 
-        # 空メモは保存しない（任意）
-        if memo_text:
-            # memoログを追記（同じsession_idで紐づけ）
-            level = get_level(score)
-            append_log_row(
-                session_id=session_id,
-                score=score,
-                level=level,
-                memo=memo_text
-            )
+    # 空メモは保存しない（任意）
+    if memo_text:
+        append_memo_row(level, score, memo_text)
 
-        return render_template("thanks.html")
-
-    except Exception:
-        logging.exception("POST /memo failed")
-        raise
-
-if __name__ == "__main__":
-    app.run(debug=True)
+    return redirect(url_for("index"))
