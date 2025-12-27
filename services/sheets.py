@@ -5,52 +5,34 @@ import gspread
 from google.oauth2.service_account import Credentials
 from datetime import datetime, timezone, timedelta
 
-SPREADSHEET_KEY = "1f9nZ2SW43Q86UEH1hiAeAn10ZNf-jYWfiQbl65SB2C0"
-
 SCOPES = [
     "https://www.googleapis.com/auth/spreadsheets",
     "https://www.googleapis.com/auth/drive",
 ]
 
-def _now_jst() -> str:
-    jst = timezone(timedelta(hours=9))
-    return datetime.now(jst).strftime("%Y-%m-%d %H:%M:%S")
+SPREADSHEET_KEY = os.environ.get("SPREADSHEET_KEY")  # なくても動くよう後で直す
 
 def get_client():
     info = json.loads(os.environ["GOOGLE_SERVICE_ACCOUNT_JSON"])
     creds = Credentials.from_service_account_info(info, scopes=SCOPES)
     return gspread.authorize(creds)
 
-def _get_or_create_ws(spreadsheet, title: str, cols: int = 10):
-    try:
-        return spreadsheet.worksheet(title)
-    except Exception:
-        return spreadsheet.add_worksheet(title=title, rows=1000, cols=cols)
-
-def save_diagnosis(session_id: str, score: int, answers: list[int], ai_text: str, level: str):
+def append_log_row(timestamp, email, level, score):
+    """
+    app.py が import する想定の関数名。
+    シートの列: timestamp, email, level, score
+    """
     client = get_client()
-    ss = client.open_by_key(SPREADSHEET_KEY)
-    ws = _get_or_create_ws(ss, "diagnosis", cols=8)
 
-    ts = _now_jst()
-    ws.append_row([
-        ts,
-        session_id,
-        score,
-        level,                 # 内部用（不要なら消してOK）
-        json.dumps(answers, ensure_ascii=False),
-        ai_text
-    ])
+    # SPREADSHEET_KEY を env に入れてるならそれを使う
+    if SPREADSHEET_KEY:
+        sheet = client.open_by_key(SPREADSHEET_KEY).sheet1
+    else:
+        # ここはあなたのキーを直書きしてるならそのままでもOK
+        sheet = client.open_by_key("1f9nZ2SW43Q86UEH1hiAeAn10ZNf-jYWfiQbl65SB2C0").sheet1
 
-def save_memo(session_id: str, score: str, memo: str):
-    client = get_client()
-    ss = client.open_by_key(SPREADSHEET_KEY)
-    ws = _get_or_create_ws(ss, "memo", cols=6)
+    sheet.append_row([timestamp, email, level, score], value_input_option="USER_ENTERED")
 
-    ts = _now_jst()
-    ws.append_row([
-        ts,
-        session_id,
-        score,
-        memo
-    ])
+def jst_now_str():
+    JST = timezone(timedelta(hours=9))
+    return datetime.now(JST).strftime("%Y-%m-%d %H:%M:%S")
