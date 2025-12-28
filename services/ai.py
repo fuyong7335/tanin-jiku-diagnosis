@@ -1,72 +1,53 @@
-# services/ai.py
 import os
 from openai import OpenAI
 
-
-def _safe_get_output_text(resp) -> str:
-    # responses API: resp.output_text が基本
-    if hasattr(resp, "output_text") and resp.output_text:
-        return resp.output_text.strip()
-    # 念のため
-    try:
-        return resp.output[0].content[0].text.strip()
-    except Exception:
-        return ""
-
-
-def generate_diagnosis_text(score: int, level: str, highlights: list[str]) -> str:
+def generate_diagnosis_text(*, score: int, highlights: list[str]) -> str:
+    """
+    score: 合計スコア
+    highlights: 高め回答の質問文（最大3つ）
+    """
     api_key = os.getenv("OPENAI_API_KEY")
     if not api_key:
-        # キー無しなら落とさず、短い固定文で返す（起動安定優先）
-        return (
-            "いくつかの回答で、相手の反応を先に考えてしまう傾向が出ています。\n"
-            "続くと自分の本音が後ろに回りやすくなります。\n"
-            "選ぶのはあなた。決めるのもあなた。答えはいつも、あなたの中にあります。"
-        )
+        # APIキーがない時の保険（アプリが落ちないようにする）
+        # ※ここはAIなしでも動くように「最低限」返す
+        lines = [
+            "今の回答には、「人の目や空気で判断が揺れやすい場面」が含まれていました。",
+            "それは弱さではなく、今までそうせざるを得なかった癖かもしれません。",
+            "でも最後に選ぶのは、いつもあなたです。",
+            "思い当たる場面が、ひとつでも浮かびますか？",
+        ]
+        return "\n".join(lines)
 
     client = OpenAI(api_key=api_key)
+    model = os.getenv("OPENAI_MODEL", "gpt-4o-mini")
 
-    # AIに渡す材料（高かった質問だけ）
-    highlight_text = "\n".join([f"- {t}" for t in highlights]) if highlights else "-（特に強い項目は少なめ）"
+    highlights_text = "\n".join([f"- {h}" for h in highlights]) if highlights else "- （特に強い項目は抽出なし）"
 
     system = (
-        "あなたは日本語の文章が上手い編集者です。"
-        "医療・心理の診断はしません。断定しません。"
-        "見出し（例：観察/鏡/問い）やラベルは一切書きません。"
-        "出力は4〜6行。1行は短め。読みやすい自然な日本語。"
-        "文章は『あなたは〜傾向があります／かもしれません』の口調で、説明臭くしない。"
-        "少し厳しさはあってよいが、責めない。"
-        "必ず1回だけ次の一文をそのまま入れる："
-        "『選ぶのはあなた。決めるのもあなた。答えはいつも、あなたの中にあります。』"
+        "あなたは日本語の文章作成者。読者を誘導せず、命令せず、一般論に逃げず、短く刺さる言葉を作る。"
+        "心理学者っぽい説明口調は避け、日常語で。断定しすぎず「〜かもしれません」を基本にする。"
+        "出力はラベル無し・箇条書き無し・4〜6行。途中に一度だけ、短くビシッとした一文を入れる。"
+        "（例：『選ぶのはあなたです。』のように）"
     )
 
-    user = f"""
-これは他人軸傾向を“自分で気づく”ための短い結果文です。
-スコア: {score}（内部用）
-強く出た項目（質問文）:
-{highlight_text}
+    user = (
+        "以下は自己理解（他人軸）診断の回答傾向です。\n"
+        f"合計スコア: {score}\n"
+        "高め回答の設問（抜粋）:\n"
+        f"{highlights_text}\n\n"
+        "この情報だけで、読み手が『あ、これ私かも』と思える短い結果文を作ってください。"
+        "話が飛ばないように、自然な流れで。"
+    )
 
-条件:
-- 見出し禁止、ラベル禁止
-- 4〜6行
-- 最後は問いで締める（短く）
-- 「他人軸」という単語を連発しない（使うなら1回まで）
-"""
-
-    resp = client.responses.create(
-        model="gpt-4o-mini",
-        input=[
+    resp = client.chat.completions.create(
+        model=model,
+        messages=[
             {"role": "system", "content": system},
             {"role": "user", "content": user},
         ],
-        max_output_tokens=240,
+        temperature=0.7,
     )
 
-    text = _safe_get_output_text(resp)
-    # 空で返ってきたときの保険
-    return text or (
-        "いくつかの回答で、相手の反応を先に考えてしまう傾向が出ています。\n"
-        "続くと自分の本音が後ろに回りやすくなります。\n"
-        "選ぶのはあなた。決めるのもあなた。答えはいつも、あなたの中にあります。\n"
-        "今、いちばん引っかかっている場面はどれですか？"
-    )
+    text = (resp.choices[0].message.content or "").strip()
+    # 念のため空対策
+    return text if text else "今の回答には、判断が外側に寄りやすい場面が含まれていました。\n選ぶのはあなたです。\n思い当たる場面が浮かびますか？"
