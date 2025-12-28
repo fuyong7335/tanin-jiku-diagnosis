@@ -1,122 +1,113 @@
-# app.py
 import os
-from uuid import uuid4
+from dataclasses import dataclass
+from flask import Flask, render_template, request, redirect, url_for, session
 
-from flask import Flask, render_template, request
-from diagnosis.logic import build_message, get_level
+from diagnosis.logic import build_message
 from services.sheets import append_result_row, append_memo_row
 
-
 app = Flask(__name__)
-app.secret_key = os.getenv("FLASK_SECRET_KEY", "dev-secret")  # Renderでは環境変数推奨
+app.secret_key = os.getenv("SECRET_KEY", "dev-secret-key")  # Renderでは環境変数推奨
 
-# ====== 質問（あなたの10問に差し替えOK） ======
-QUESTIONS = [
-    {"id": 1, "text": "断る前に、相手の反応を先に想像してしまう", "choices": [
-        ("当てはまらない", 0), ("あまり当てはまらない", 1), ("どちらでもない", 2), ("わりと当てはまる", 3), ("とても当てはまる", 4)
-    ]},
-    {"id": 2, "text": "自分で決めたはずなのに、誰かの許可が欲しくなることがある", "choices": [
-        ("当てはまらない", 0), ("あまり当てはまらない", 1), ("どちらでもない", 2), ("わりと当てはまる", 3), ("とても当てはまる", 4)
-    ]},
-    {"id": 3, "text": "相手の機嫌が少し変わると、内容より先に心が動く", "choices": [
-        ("当てはまらない", 0), ("あまり当てはまらない", 1), ("どちらでもない", 2), ("わりと当てはまる", 3), ("とても当てはまる", 4)
-    ]},
-    {"id": 4, "text": "本音を言う前に、正解っぽい言い方を探してしまう", "choices": [
-        ("当てはまらない", 0), ("あまり当てはまらない", 1), ("どちらでもない", 2), ("わりと当てはまる", 3), ("とても当てはまる", 4)
-    ]},
-    {"id": 5, "text": "迷ったとき、自分の感覚より「波風が立たない方」を選びやすい", "choices": [
-        ("当てはまらない", 0), ("あまり当てはまらない", 1), ("どちらでもない", 2), ("わりと当てはまる", 3), ("とても当てはまる", 4)
-    ]},
-    {"id": 6, "text": "「ちゃんとしなきゃ」が動機になっていることがある", "choices": [
-        ("当てはまらない", 0), ("あまり当てはまらない", 1), ("どちらでもない", 2), ("わりと当てはまる", 3), ("とても当てはまる", 4)
-    ]},
-    {"id": 7, "text": "頑張っているのに、満たされなさが残ることがある", "choices": [
-        ("当てはまらない", 0), ("あまり当てはまらない", 1), ("どちらでもない", 2), ("わりと当てはまる", 3), ("とても当てはまる", 4)
-    ]},
-    {"id": 8, "text": "選んだあとに「これでよかったのか」を繰り返し考えてしまう", "choices": [
-        ("当てはまらない", 0), ("あまり当てはまらない", 1), ("どちらでもない", 2), ("わりと当てはまる", 3), ("とても当てはまる", 4)
-    ]},
-    {"id": 9, "text": "変わりたい気持ちはあるが、安全な場所を離れたくない", "choices": [
-        ("当てはまらない", 0), ("あまり当てはまらない", 1), ("どちらでもない", 2), ("わりと当てはまる", 3), ("とても当てはまる", 4)
-    ]},
-    {"id": 10, "text": "人の期待を感じると、自分の気持ちより先に応えようとしてしまう", "choices": [
-        ("当てはまらない", 0), ("あまり当てはまらない", 1), ("どちらでもない", 2), ("わりと当てはまる", 3), ("とても当てはまる", 4)
-    ]},
+@dataclass
+class Question:
+    id: int
+    text: str
+    choices: list[tuple[str, int]]
+
+CHOICES = [
+    ("あてはまらない", 0),
+    ("少しあてはまる", 1),
+    ("あてはまる", 2),
+    ("とてもあてはまる", 3),
 ]
 
-# 結果をメモ投稿後に再描画するための一時キャッシュ（Render 1インスタンス想定）
-RESULTS_CACHE = {}
-
+# 本の導線に寄せた質問（例：10問）
+QUESTIONS = [
+    Question(1, "人からどう思われるかを、つい気にしてしまう。", CHOICES),
+    Question(2, "決めるとき、自分の気持ちより相手の気持ちを優先しがちだ。", CHOICES),
+    Question(3, "頼まれると断れないことが多い。", CHOICES),
+    Question(4, "モヤモヤしても「気のせい」と自分に言い聞かせることがある。", CHOICES),
+    Question(5, "誰かに迷惑をかけるのが怖い。", CHOICES),
+    Question(6, "「ちゃんとしなきゃ」が頭の中で鳴りやすい。", CHOICES),
+    Question(7, "本当はどうしたいのか、自分でも分からなくなる時がある。", CHOICES),
+    Question(8, "人に嫌われたくない気持ちが強い。", CHOICES),
+    Question(9, "相手に合わせすぎて、自分の意見を言えないことがある。", CHOICES),
+    Question(10, "感情が揺れたとき、「私が悪いのかな」と思いやすい。", CHOICES),
+]
 
 @app.get("/")
 def index():
-    return render_template("form.html", questions=QUESTIONS)
+    # ワンクッション（ここから開始）
+    return render_template("index.html")
 
+@app.route("/form", methods=["GET", "POST"])
+def form():
+    if request.method == "GET":
+        return render_template("form.html", questions=QUESTIONS)
 
-@app.get("/form")
-def form_get():
-    return render_template("form.html", questions=QUESTIONS)
-
-
-@app.post("/form")
-def form_post():
+    # POST：採点
     answers = []
     for q in QUESTIONS:
-        v = int(request.form.get(f"answer{q['id']}", "0"))
+        v = int(request.form.get(f"answer{q.id}", "0"))
         answers.append((q, v))
 
     total_score = sum(v for _, v in answers)
 
-    # “高め”の項目を最大3つだけ AIに渡す（>=3 はおすすめ）
-    highlights = [q["text"] for (q, v) in answers if v >= 3][:3]
+    # 高め回答（3以上）を最大3つ抽出
+    highlights = [q.text for (q, v) in answers if v >= 3][:3]
 
-    result = build_message(total_score, highlights=highlights)
+    # AI結果生成
+    result = build_message(total_score, highlights)
 
-    session_id = str(uuid4())
-    RESULTS_CACHE[session_id] = {"result": result, "score": total_score}
+    # スプシ保存（結果ログ）
+    try:
+        append_result_row(score=total_score, highlights=highlights, ai_text=result["text"])
+    except Exception:
+        # スプシが落ちても画面は出す（ユーザー体験優先）
+        pass
 
-    # スプシ保存（未設定でも落とさない設計）
-    level = get_level(total_score)
-    compact_answers = [(q["id"], v) for (q, v) in answers]
-    append_result_row(
-        score=total_score,
-        level=level,
-        ai_text=result["text"],
-        highlights=highlights,
-        answers=compact_answers,
-    )
+    # resultをセッションに保存（/memo で再表示するため）
+    session["score"] = total_score
+    session["result_text"] = result["text"]
 
     return render_template(
         "result.html",
         result=result,
-        session_id=session_id,
         score=total_score,
         memo_saved=False,
     )
 
-
 @app.post("/memo")
-def memo_post():
-    memo = (request.form.get("memo") or "").strip()
-    session_id = request.form.get("session_id") or ""
-    score = int(request.form.get("score") or "0")
+def memo():
+    memo_text = (request.form.get("memo") or "").strip()
+    score = session.get("score", "")
+    result_text = session.get("result_text", "")
 
-    if memo:
-        append_memo_row(score=score, memo=memo)
+    # 空メモは何もしないで結果へ戻す（Method Not Allowed回避＆UX）
+    if not memo_text:
+        return render_template(
+            "result.html",
+            result={"text": result_text, "cta": ""},
+            score=score,
+            memo_saved=False,
+        )
 
-    cached = RESULTS_CACHE.get(session_id)
-    if not cached:
-        # キャッシュが消えていても落とさない（最低限のサンクス）
-        return "受け取りました。ありがとうございます。"
+    # 長すぎ対策
+    if len(memo_text) > 500:
+        memo_text = memo_text[:500]
+
+    try:
+        append_memo_row(score=int(score) if str(score).isdigit() else 0, memo=memo_text)
+        saved = True
+    except Exception:
+        saved = False
 
     return render_template(
         "result.html",
-        result=cached["result"],
-        session_id=session_id,
-        score=cached["score"],
-        memo_saved=True,
+        result={"text": result_text, "cta": ""},
+        score=score,
+        memo_saved=saved,
     )
-
 
 if __name__ == "__main__":
     app.run(debug=True)
