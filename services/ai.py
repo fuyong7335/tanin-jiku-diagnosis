@@ -2,41 +2,71 @@
 import os
 from openai import OpenAI
 
-client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-SYSTEM_PROMPT = """
-あなたは日本語の文章作成者です。
-ユーザーの診断回答（文章の断片）を材料に、短く自然な日本語で結果メッセージを書きます。
+def _safe_get_output_text(resp) -> str:
+    # responses API: resp.output_text が基本
+    if hasattr(resp, "output_text") and resp.output_text:
+        return resp.output_text.strip()
+    # 念のため
+    try:
+        return resp.output[0].content[0].text.strip()
+    except Exception:
+        return ""
 
-制約:
-- 見出し（観察/鏡/問い/判定など）を出さない
-- 「今回の回答は」「傾向を示しています」など説明っぽい言い回しは避ける
-- 「舵」「外側/内側」など抽象メタファーは使わない
-- 4〜6行の短文（スマホで読みやすく）
-- 1行だけ、芯のある言葉を入れる（例: 選ぶのはあなた。答えはあなたの中にある。）
-- 断定しすぎない（〜かもしれません／〜になりやすい）
-"""
 
-def generate_result_text(score: int, highlights_text: str) -> str:
-    # highlights_text は「強く出た回答（質問文）」の短い抜粋が入る想定
-    user_prompt = f"""
-スコア: {score}
+def generate_diagnosis_text(score: int, level: str, highlights: list[str]) -> str:
+    api_key = os.getenv("OPENAI_API_KEY")
+    if not api_key:
+        # キー無しなら落とさず、短い固定文で返す（起動安定優先）
+        return (
+            "いくつかの回答で、相手の反応を先に考えてしまう傾向が出ています。\n"
+            "続くと自分の本音が後ろに回りやすくなります。\n"
+            "選ぶのはあなた。決めるのもあなた。答えはいつも、あなたの中にあります。"
+        )
 
-強く出た要素（抜粋）:
-{highlights_text}
+    client = OpenAI(api_key=api_key)
 
-この材料を使って、結果メッセージを4〜6行で作ってください。
-"""
+    # AIに渡す材料（高かった質問だけ）
+    highlight_text = "\n".join([f"- {t}" for t in highlights]) if highlights else "-（特に強い項目は少なめ）"
 
-    # OpenAI公式の Python SDK は responses.create / output_text が使えます
-    # （platform.openai.com のドキュメント例と同じ形）
-    resp = client.responses.create(
-        model=os.getenv("OPENAI_MODEL", "gpt-4o-mini"),
-        input=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": user_prompt},
-        ],
-        temperature=0.7,
-        max_output_tokens=220,
+    system = (
+        "あなたは日本語の文章が上手い編集者です。"
+        "医療・心理の診断はしません。断定しません。"
+        "見出し（例：観察/鏡/問い）やラベルは一切書きません。"
+        "出力は4〜6行。1行は短め。読みやすい自然な日本語。"
+        "文章は『あなたは〜傾向があります／かもしれません』の口調で、説明臭くしない。"
+        "少し厳しさはあってよいが、責めない。"
+        "必ず1回だけ次の一文をそのまま入れる："
+        "『選ぶのはあなた。決めるのもあなた。答えはいつも、あなたの中にあります。』"
     )
-    return (resp.output_text or "").strip()
+
+    user = f"""
+これは他人軸傾向を“自分で気づく”ための短い結果文です。
+スコア: {score}（内部用）
+強く出た項目（質問文）:
+{highlight_text}
+
+条件:
+- 見出し禁止、ラベル禁止
+- 4〜6行
+- 最後は問いで締める（短く）
+- 「他人軸」という単語を連発しない（使うなら1回まで）
+"""
+
+    resp = client.responses.create(
+        model="gpt-4o-mini",
+        input=[
+            {"role": "system", "content": system},
+            {"role": "user", "content": user},
+        ],
+        max_output_tokens=240,
+    )
+
+    text = _safe_get_output_text(resp)
+    # 空で返ってきたときの保険
+    return text or (
+        "いくつかの回答で、相手の反応を先に考えてしまう傾向が出ています。\n"
+        "続くと自分の本音が後ろに回りやすくなります。\n"
+        "選ぶのはあなた。決めるのもあなた。答えはいつも、あなたの中にあります。\n"
+        "今、いちばん引っかかっている場面はどれですか？"
+    )
