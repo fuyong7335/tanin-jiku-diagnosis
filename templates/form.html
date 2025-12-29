@@ -16,7 +16,26 @@
     .choice{display:inline-flex;align-items:center;gap:6px;padding:10px 12px;border:1px solid #f0d7df;border-radius:999px;background:#fff;}
     input[type="radio"]{transform:scale(1.05);}
     button{display:inline-block;margin-top:10px;padding:12px 18px;border:none;border-radius:999px;background:#f2c6d0;font-size:15px;font-weight:700;cursor:pointer;}
-    button:hover{opacity:.9;}
+    button:hover{opacity:.9;}<style>
+  /* 1問ごとの選択肢を縦にする */
+  .question label{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:10px 0;
+    padding:10px 12px;
+    border:1px solid #f2c6d0;
+    border-radius:14px;
+    background:#fff;
+  }
+
+  /* ラジオを少し見やすく */
+  .question input[type="radio"]{
+    transform: scale(1.05);
+  }
+</style>
+
+
   </style>
 </head>
 <body>
