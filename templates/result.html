@@ -7,49 +7,44 @@
   <style>
     body{margin:0;background:#fbf5f7;font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;color:#3a3a3a;line-height:1.9;}
     .page{min-height:100vh;display:flex;justify-content:center;align-items:center;padding:24px;box-sizing:border-box;}
-    .card{background:#fff;width:100%;max-width:680px;padding:28px;border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,.05);}
-    .text p{margin:0 0 14px 0;font-size:16px;}
-    hr{border:none;border-top:1px solid #f0d7df;margin:22px 0;}
-    .memo-label{font-weight:600;margin:10px 0 8px 0;}
-    .memo-help{font-size:13px;color:#666;margin:0 0 10px 0;}
-    textarea{width:100%;min-height:96px;padding:10px 12px;border-radius:12px;border:1px solid #ddd;box-sizing:border-box;font-size:14px;resize:vertical;}
-    .btn{display:inline-block;margin-top:12px;padding:10px 14px;border-radius:999px;background:#f2c6d0;color:#3a3a3a;text-decoration:none;font-weight:600;border:none;cursor:pointer;}
-    .btn:hover{opacity:.9;}
-    .note{font-size:12px;color:#777;margin-top:8px;}
-    .ok{font-size:13px;color:#666;margin-top:10px;}
+    .card{background:#fff;max-width:720px;width:100%;padding:28px;border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,0.04);}
+    h1{font-size:18px;margin:0 0 12px;}
+    .block{margin:14px 0;}
+    .stopper{white-space:pre-line;color:#555;background:#fff;border-left:4px solid #f2c6d0;padding:12px 14px;border-radius:10px;}
+    textarea{width:100%;max-width:520px;height:120px;border:1px solid #f0d7df;border-radius:12px;padding:12px;box-sizing:border-box;font-size:14px;line-height:1.6;}
+    .row{margin-top:10px;}
+    button{display:inline-block;padding:10px 16px;border:none;border-radius:999px;background:#f2c6d0;font-size:14px;font-weight:700;cursor:pointer;}
+    button:hover{opacity:.9;}
+    .note{font-size:12px;color:#888;margin-top:10px;}
   </style>
 </head>
 <body>
   <div class="page">
     <div class="card">
+      <h1>{{ result.title }}</h1>
 
-      <div class="text">
-        {% for line in result.text.split('\n') %}
-          {% if line.strip() %}
-            <p>{{ line }}</p>
-          {% endif %}
-        {% endfor %}
-      </div>
+      <div class="block">{{ result.observation }}</div>
+      <div class="block">{{ result.mirror }}</div>
+      <div class="block"><strong>問い：</strong>{{ result.question }}</div>
 
-      <hr>
+      <div class="block stopper">{{ result.stopper }}</div>
 
-      <form method="post" action="/memo">
-        <div class="memo-label">ひとことメモ（匿名）</div>
-        <p class="memo-help">
-          返事はいりません。1行でも大丈夫です。<br>
-          ※個人が特定される情報は書かないでください。
-        </p>
+      <hr style="border:none;border-top:1px solid #f0d7df;margin:22px 0;">
 
-        <textarea name="memo" placeholder="1行でもOKです（個人情報は書かないでください）"></textarea>
+      <form method="post" action="/message">
+        <input type="hidden" name="level" value="{{ result.level }}">
+        <input type="hidden" name="score" value="{{ total_score }}">
 
-        <button class="btn" type="submit">メモを送る</button>
-        <div class="note">※返信は行っていません。</div>
+        <div class="block">
+          <strong>ひとこと（任意）</strong><br>
+          <textarea name="message" placeholder="今の気持ちを、短くでも大丈夫です。"></textarea>
+          <div class="note">※返信相談は行いません。受け取りのメッセージのみ表示されます。</div>
+        </div>
 
-        {% if memo_saved %}
-          <div class="ok">受け取りました。ありがとうございます。</div>
-        {% endif %}
+        <div class="row">
+          <button type="submit">送る</button>
+        </div>
       </form>
-
     </div>
   </div>
 </body>
