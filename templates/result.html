@@ -34,10 +34,7 @@
     <div class="card">
       <h1>{{ result.title }}</h1>
 
-      <div class="block">{{ result.observation }}</div>
-      <div class="block">{{ result.mirror }}</div>
-      <div class="block"><strong>問い：</strong>{{ result.question }}</div>
-
+      
       <div class="block stopper">{{ result.stopper }}</div>
 
       <hr style="border:none;border-top:1px solid #f0d7df;margin:22px 0;">
@@ -47,7 +44,7 @@
         <input type="hidden" name="score" value="{{ total_score }}">
 
         <div class="block">
-          <strong>ひとこと（任意）</strong><br>
+          <strong>ひとこと</strong><br>
           <textarea name="message" placeholder="今の気持ちを、短くでも大丈夫です。"></textarea>
           <div class="note">※返信相談は行いません。受け取りのメッセージのみ表示されます。</div>
         </div>
