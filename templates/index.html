@@ -1,25 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>他人軸タイプ診断</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      margin: 0;
+      background: #fbf5f7;
+      font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", sans-serif;
+      color: #3a3a3a;
+    }
+
+    /* ★ センタリングはここ */
+    .container {
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+      box-sizing: border-box;
+    }
+
+    .card {
+      background: #fff;
+      max-width: 520px;
+      width: 100%;
+      padding: 32px;
+      border-radius: 16px;
+      box-shadow: 0 6px 20px rgba(0,0,0,.05);
+      text-align: center;
+    }
+
+    h1 {
+      font-size: 22px;
+      margin-bottom: 16px;
+    }
+
+    p {
+      font-size: 15px;
+      line-height: 1.9;
+      margin-bottom: 20px;
+    }
+
+    .note {
+      font-size: 12px;
+      color: #777;
+      margin-top: 12px;
+    }
+
+    a.button {
+      display: inline-block;
+      padding: 12px 28px;
+      background: #f2c6d0;
+      color: #333;
+      border-radius: 999px;
+      text-decoration: none;
+      font-weight: 600;
+    }
+  </style>
+</head>
 <body>
-  <div class="center-wrap">
+
+  <div class="container">
     <div class="card">
+      <h1>自己理解アプリ</h1>
 
-      <p class="lead">
-        自己理解アプリ
-      </p>
-
-      <p class="description">
+      <p>
         自作の診断アプリです。<br>
-        10問の質問に、<strong>きれいに考えず、直感で</strong>答えてください。<br>
-        小さな気づきがあれば幸いです。
+        10問の質問に、<br>
+        近いものを直感で選んでください。
       </p>
 
-      <p class="note">
+      <p>
+        今のあなたの<br>
+        「判断のクセ（他人軸に寄りやすい傾向）」を<br>
+        見える化します。
+      </p>
+
+      <a href="/form" class="button">診断をはじめる</a>
+
+      <div class="note">
         ※医療・心理診断ではありません
-      </p>
-
-      <a href="/form">
-        <button>診断をはじめる</button>
-      </a>
-
+      </div>
     </div>
   </div>
+
 </body>
+</html>
