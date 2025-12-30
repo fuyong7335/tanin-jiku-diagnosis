@@ -1,22 +1,19 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>診断結果</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body{margin:0;background:#fbf5f7;font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;color:#3a3a3a;line-height:1.9;}
     .page{min-height:100vh;display:flex;justify-content:center;align-items:center;padding:24px;box-sizing:border-box;}
-    .card{background:#fff;max-width:720px;width:100%;padding:28px;border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,0.04);}
-    h1{font-size:18px;margin:0 0 12px;text-align:center;}
-
+    .card{background:#fff;max-width:720px;width:100%;padding:28px;border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,.04);}
+    h1{font-size:18px;margin:0 0 12px;}
     .block{margin:14px 0;}
-    .stopper{white-space:pre-line;color:#555;background:#fff;border:1px solid #f0d7df;padding:12px 14px;border-radius:10px;}
-
     textarea{width:100%;max-width:520px;height:120px;border:1px solid #f0d7df;border-radius:12px;padding:12px;box-sizing:border-box;font-size:14px;line-height:1.6;}
-    .row{margin-top:10px;text-align:center;}
     button{display:inline-block;padding:10px 16px;border:none;border-radius:999px;background:#f2c6d0;font-size:14px;font-weight:700;cursor:pointer;}
     button:hover{opacity:.9;}
+    .note{font-size:12px;color:#888;margin-top:10px;}
   </style>
 </head>
 <body>
@@ -24,11 +21,13 @@
     <div class="card">
       <h1>{{ result.title }}</h1>
 
-      <div class="block">{{ result.body }}</div>
+      <div class="block">{{ result.observation }}</div>
+      <div class="block">{{ result.mirror }}</div>
+      <div class="block">{{ result.question }}</div>
 
       <hr style="border:none;border-top:1px solid #f0d7df;margin:22px 0;">
 
-      <div class="block" style="color:#555;">
+      <div class="block">
         診断メッセージをご覧になって、気づいたこと・感じたことがあれば、ひとことお送りください。
       </div>
 
@@ -36,11 +35,10 @@
         <input type="hidden" name="level" value="{{ result.level }}">
         <input type="hidden" name="score" value="{{ total_score }}">
 
-        <div class="block">
-          <textarea name="message" placeholder="短くでも大丈夫です。"></textarea>
-        </div>
+        <textarea name="message" placeholder="短くても大丈夫です。"></textarea>
+        <div class="note">※こちらから返信はしません。受け取りのみ表示されます。</div>
 
-        <div class="row">
+        <div style="margin-top:10px;">
           <button type="submit">送る</button>
         </div>
       </form>
