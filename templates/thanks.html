@@ -1,22 +1,23 @@
+<!-- templates/thanks.html -->
 <!DOCTYPE html>
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
+  <title>送信しました</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>受け取りました</title>
   <style>
     body{margin:0;background:#fbf5f7;font-family:"Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;color:#3a3a3a;line-height:1.9;}
     .page{min-height:100vh;display:flex;justify-content:center;align-items:center;padding:24px;box-sizing:border-box;}
-    .card{background:#fff;max-width:720px;width:100%;padding:28px;border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,.05);}
-    a{color:#555;}
+    .card{background:#fff;max-width:640px;width:100%;padding:28px;border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,0.04);text-align:center;}
+    a{display:inline-block;margin-top:14px;color:#cc5f7b;text-decoration:none;font-weight:700;}
   </style>
 </head>
 <body>
   <div class="page">
     <div class="card">
+      <h1>ありがとうございます</h1>
       <p>受け取りました。</p>
-      <p>このやり取りが、<br>あなたの中に小さな気づきを残しますように。</p>
-      <p><a href="/">トップへ戻る</a></p>
+      <a href="/form">もう一度診断する</a>
     </div>
   </div>
 </body>
