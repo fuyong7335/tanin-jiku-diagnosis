@@ -3,7 +3,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 from dotenv import load_dotenv
-load_dotenv()  # ローカル用（Renderでは環境変数が入る）
+load_dotenv()  # ローカル用（RenderではEnvironmentが使われる）
 
 from flask import Flask, render_template, request
 
@@ -24,22 +24,17 @@ def form():
     if request.method == "POST":
         try:
             scores = []
-            for key in request.form:
+            for key, val in request.form.items():
                 if key.startswith("answer"):
-                    scores.append(int(request.form[key]))
+                    scores.append(int(val))
 
             total_score = sum(scores)
             result = build_message(total_score)
 
             logging.info("POST /form received")
-            logging.info(f"total_score: {total_score}")
-            logging.info(f"level: {result['level']}")
+            logging.info("total_score=%s level=%s", total_score, result["level"])
 
-            return render_template(
-                "result.html",
-                result=result,
-                total_score=total_score
-            )
+            return render_template("result.html", result=result, total_score=total_score)
 
         except Exception:
             logging.exception("=== POST ERROR (/form) ===")
@@ -52,15 +47,14 @@ def form():
 def message():
     try:
         user_message = (request.form.get("message") or "").strip()
-        level = request.form.get("level") or ""
-        score = request.form.get("score") or ""
+        level = (request.form.get("level") or "").strip()
+        score = (request.form.get("score") or "").strip()
 
-        logging.info("POST /message received")
-        logging.info(f"level: {level}, score: {score}, message_len: {len(user_message)}")
+        logging.info("POST /message received level=%s score=%s len=%s", level, score, len(user_message))
 
         # 空送信は保存しない（押し間違い対策）
         if user_message:
-            save_message(level=level, score=str(score), message=user_message)
+            save_message(level=level, score=score, message=user_message)
 
         return render_template("thanks.html")
 
