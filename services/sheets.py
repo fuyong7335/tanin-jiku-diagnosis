@@ -8,8 +8,7 @@ from google.oauth2.service_account import Credentials
 
 
 def get_client():
-    raw = os.environ["GOOGLE_SERVICE_ACCOUNT_JSON"]  # 未設定だと KeyError
-    service_account_info = json.loads(raw)  # JSON壊れてると JSONDecodeError
+    service_account_info = json.loads(os.environ["GOOGLE_SERVICE_ACCOUNT_JSON"])
 
     scopes = [
         "https://www.googleapis.com/auth/spreadsheets",
@@ -20,14 +19,12 @@ def get_client():
     return gspread.authorize(creds)
 
 
-def save_message(level: str, score: str, message: str):
+def save_message(level: str, score: int, message: str):
     client = get_client()
 
-    sheet_key = os.environ["SPREADSHEET_KEY"]  # 未設定だと KeyError
-    spreadsheet = client.open_by_key(sheet_key)
-
-    tab_name = os.environ.get("SHEET_TAB_NAME")
-    sheet = spreadsheet.worksheet(tab_name) if tab_name else spreadsheet.sheet1
+    sheet_key = os.environ["SPREADSHEET_KEY"]  # Renderの環境変数
+    sheet = client.open_by_key(sheet_key).sheet1
 
     timestamp = datetime.now().isoformat(timespec="seconds")
+
     sheet.append_row([timestamp, level, score, message])
