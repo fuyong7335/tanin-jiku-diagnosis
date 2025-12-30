@@ -26,5 +26,4 @@ def save_message(level: str, score: str, message: str):
     sheet = client.open_by_key(sheet_key).sheet1
 
     timestamp = datetime.now().isoformat(timespec="seconds")
-
     sheet.append_row([timestamp, level, score, message])
