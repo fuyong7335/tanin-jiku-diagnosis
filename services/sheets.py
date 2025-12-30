@@ -19,12 +19,11 @@ def get_client():
     return gspread.authorize(creds)
 
 
-def save_message(level: str, score: int, message: str):
+def save_message(level: str, score: str, message: str):
     client = get_client()
 
-    sheet_key = os.environ["SPREADSHEET_KEY"]  # Renderの環境変数
+    sheet_key = os.environ["SPREADSHEET_KEY"]  # Renderの環境変数に入れる
     sheet = client.open_by_key(sheet_key).sheet1
 
     timestamp = datetime.now().isoformat(timespec="seconds")
-
     sheet.append_row([timestamp, level, score, message])
