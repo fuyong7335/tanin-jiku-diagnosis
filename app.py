@@ -3,7 +3,7 @@ import logging
 logging.basicConfig(level=logging.INFO)
 
 from dotenv import load_dotenv
-load_dotenv()  # ローカル用（Renderでは環境変数を使う）
+load_dotenv()  # ローカル用（Renderでは環境変数が入る）
 
 from flask import Flask, render_template, request
 
@@ -32,14 +32,9 @@ def form():
             result = build_message(total_score)
 
             logging.info("POST /form received")
-            logging.info(f"total_score: {total_score}")
-            logging.info(f"level: {result['level']}")
+            logging.info("total_score=%s level=%s", total_score, result.get("level"))
 
-            return render_template(
-                "result.html",
-                result=result,
-                total_score=total_score
-            )
+            return render_template("result.html", result=result, total_score=total_score)
 
         except Exception:
             logging.exception("=== POST ERROR (/form) ===")
@@ -55,12 +50,11 @@ def message():
         level = request.form.get("level") or ""
         score = request.form.get("score") or ""
 
-        logging.info("POST /message received")
-        logging.info(f"level: {level}, score: {score}, message_len: {len(user_message)}")
+        logging.info("POST /message received level=%s score=%s len=%s", level, score, len(user_message))
 
-        # 空送信は保存しない
+        # 空なら保存しない（誤タップ対策）
         if user_message:
-            save_message(level=level, score=score, message=user_message)
+            save_message(level=level, score=str(score), message=user_message)
 
         return render_template("thanks.html")
 
