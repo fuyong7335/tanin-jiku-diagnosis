@@ -23,7 +23,6 @@ def index():
 def form():
     if request.method == "POST":
         try:
-            # 回答スコア集計
             scores = []
             for key in request.form:
                 if key.startswith("answer"):
@@ -36,9 +35,13 @@ def form():
             logging.info(f"total_score: {total_score}")
             logging.info(f"level: {result['level']}")
 
-            return render_template("result.html", result=result, total_score=total_score)
+            return render_template(
+                "result.html",
+                result=result,
+                total_score=total_score
+            )
 
-        except Exception as e:
+        except Exception:
             logging.exception("=== POST ERROR (/form) ===")
             raise
 
@@ -57,7 +60,7 @@ def message():
 
         # 空送信は保存しない（押し間違い対策）
         if user_message:
-            save_message(level=level, score=score, message=user_message)
+            save_message(level=level, score=str(score), message=user_message)
 
         return render_template("thanks.html")
 
