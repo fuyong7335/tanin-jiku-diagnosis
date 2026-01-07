@@ -1,8 +1,10 @@
 # diagnosis/logic.py
-# 役割：合計スコアから判定し、結果メッセージを組み立てる
+# 役割：合計スコアからパターン判定し、結果メッセージを返す
 
 def get_level(score: int) -> str:
-    # 10問 × 0..3 の想定（合計 0..30）
+    """
+    10問・各0..3想定 -> 合計 0..30
+    """
     if score >= 22:
         return "strong"   # パターンC
     elif score >= 14:
@@ -20,7 +22,7 @@ COMMON_END = (
 )
 
 MESSAGES = {
-    "light": {  # パターンA
+    "light": {  # パターンA（浅め）
         "title": "診断メッセージ",
         "observation": (
             "今のあなたは、\n"
@@ -44,13 +46,12 @@ MESSAGES = {
         "question": COMMON_END,
     },
 
-    "middle": {  # パターンB
+    "middle": {  # パターンB（中くらい）
         "title": "診断メッセージ",
         "observation": (
             "今のあなたは、\n"
-            "自分の気持ちよりも先に、\n"
-            "相手の反応を受け取ってしまう時間が\n"
-            "少し長く続いているのかもしれません。"
+            "自分の気持ちより先に相手の反応を考えてしまい、\n"
+            "動けなくなることがあるようです。"
         ),
         "needle": (
             "ちゃんと考えている。\n"
@@ -69,7 +70,7 @@ MESSAGES = {
         "question": COMMON_END,
     },
 
-    "strong": {  # パターンC
+    "strong": {  # パターンC（深め）
         "title": "診断メッセージ",
         "observation": (
             "今のあなたは、\n"
@@ -98,8 +99,8 @@ MESSAGES = {
 }
 
 
-def build_message(score: int) -> dict:
-    level = get_level(score)
+def build_message(total_score: int) -> dict:
+    level = get_level(total_score)
     data = MESSAGES[level]
 
     return {
