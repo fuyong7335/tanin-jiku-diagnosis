@@ -10,7 +10,7 @@
     .page{min-height:100vh;display:flex;justify-content:center;align-items:center;padding:24px;box-sizing:border-box;}
     .card{background:#fff;max-width:720px;width:100%;padding:28px;border-radius:16px;box-shadow:0 6px 20px rgba(0,0,0,0.04);}
     h1{font-size:18px;margin:0 0 12px;}
-    .block{margin:14px 0;}
+    .block{margin:14px 0; white-space:pre-line;} /* ★ 改行を反映 */
     textarea{width:100%;max-width:520px;height:120px;border:1px solid #f0d7df;border-radius:12px;padding:12px;box-sizing:border-box;font-size:14px;line-height:1.6;}
     button{display:inline-block;padding:10px 16px;border:none;border-radius:999px;background:#f2c6d0;font-size:14px;font-weight:700;cursor:pointer;}
     button:hover{opacity:.9;}
@@ -40,7 +40,7 @@
         <div class="note">※返信は行いません。受け取りのメッセージのみ表示されます。</div>
 
         <div style="margin-top:10px;">
-          <button type="submit">送る</button>
+          <button type="submit">送信</button> <!-- ★ 送る → 送信 -->
         </div>
       </form>
     </div>
