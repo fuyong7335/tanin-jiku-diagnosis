@@ -1,16 +1,6 @@
 # diagnosis/logic.py
 # 役割：合計スコアからレベル判定し、結果メッセージを返す
 
-def get_level(score: int) -> str:
-    # 10問×0-3想定（合計 0..30）
-    if score >= 22:
-        return "strong"   # パターンC
-    elif score >= 14:
-        return "middle"   # パターンB
-    else:
-        return "light"    # パターンA
-
-
 COMMON_END = (
     "この画面を閉じても、\n"
     "何も変わらなくて大丈夫です。\n\n"
@@ -19,9 +9,8 @@ COMMON_END = (
     "それで十分です。"
 )
 
-
 MESSAGES = {
-    "light": {  # パターンA（浅め・まだ距離がある状態）
+    "light": {  # パターンA
         "title": "診断メッセージ",
         "observation": (
             "今のあなたは、\n"
@@ -45,12 +34,12 @@ MESSAGES = {
         "question": COMMON_END,
     },
 
-    "middle": {  # パターンB（中くらい・違和感がはっきりしている状態）
+    "middle": {  # パターンB
         "title": "診断メッセージ",
         "observation": (
             "今のあなたは、\n"
             "自分の気持ちより先に相手の反応を考えてしまい、\n"
-            "動き出しが遅れることがあるのかもしれません。"
+            "動けなくなることがあるようです。"
         ),
         "needle": (
             "ちゃんと考えている。\n"
@@ -69,12 +58,12 @@ MESSAGES = {
         "question": COMMON_END,
     },
 
-    "strong": {  # パターンC（深め・しんどさを抱えた状態）
+    "strong": {  # パターンC
         "title": "診断メッセージ",
         "observation": (
             "今のあなたは、\n"
             "自分の気持ちよりも、\n"
-            "場の空気や誰かの期待を優先することが、\n"
+            "場の空気や誰かの期待を優先することが\n"
             "当たり前になっているのかもしれません。"
         ),
         "needle": (
@@ -98,10 +87,19 @@ MESSAGES = {
 }
 
 
+def get_level(score: int) -> str:
+    # 10問×0..3 => 0..30
+    if score >= 22:
+        return "strong"   # パターンC
+    elif score >= 14:
+        return "middle"   # パターンB
+    else:
+        return "light"    # パターンA
+
+
 def build_message(score: int) -> dict:
     level = get_level(score)
     data = MESSAGES[level]
-
     return {
         "level": level,
         "title": data["title"],
